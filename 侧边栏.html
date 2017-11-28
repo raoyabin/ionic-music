@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <title></title>
+    <link rel="stylesheet" href="css/ionic.css"/>
+    <script src="js/ionic.bundle.min.js"></script>
+    <style>
+        #menuCon{
+            margin-top: 44px;
+        }
+    </style>
+</head>
+<body>
+<ion-nav-view></ion-nav-view>
+
+<script>
+    angular.module("app",['ionic'])
+            .config(function($ionicConfigProvider){
+
+                //  缓存信息配置
+                //$ionicConfigProvider.views.forwconfigardCache(true);
+
+
+                // 不同平台样式兼容性配置
+                $ionicConfigProvider.platform.android.tabs.position("bottom");
+                $ionicConfigProvider.platform.ios.tabs.position("bottom");
+                $ionicConfigProvider.platform.ios.navBar.alignTitle('center');
+                $ionicConfigProvider.platform.android.navBar.alignTitle('center');
+            })
+            .run(function($ionicPlatform) {
+                $ionicPlatform.ready(function() {
+                    // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+                    // for form inputs)
+                    if(window.cordova && window.cordova.plugins.Keyboard) {
+                        cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+                    }
+                    if(window.StatusBar) {
+                        StatusBar.styleDefault();
+                    }
+                });
+            })
+            .config(function($stateProvider,$urlRouterProvider){
+                $urlRouterProvider.otherwise("/app/playlists")
+                $stateProvider
+                        .state("app",{
+                            url:'/app',
+                            templateUrl:'menu.html'
+                        })
+                        .state("app.playlists",{
+                            url:'/playlists',
+                            views:{
+                                "menuContent":{
+                                    templateUrl:'playlists.html'
+                                }
+                            },
+                            controller:"playlistsCtrl"
+                        })
+                        .state("app.center",{
+                            url:'/center',
+                            views:{
+                                "menuContent":{
+                                    templateUrl:'center.html'
+                                }
+                            }
+                        })
+                        .state("app.collection",{
+                            url:'/collection',
+                            views:{
+                                "menuContent":{
+                                    templateUrl:'collection.html'
+                                }
+                            }
+                        })
+            })
+            .controller("playlistsCtrl",function($scope){
+                $scope.items = [
+                    {id:'no0',name:'Fantasic Baby'},
+                    {id:'no1',name:'进击的巨人'},
+                    {id:'no2',name:'微微一笑很倾城'},
+                    {id:'no3',name:'彩虹'},
+                    {id:'no4',name:'南山南'},
+                    {id:'no5',name:'小幸运'}
+                ];
+                $scope.src = "music/no2.mp3";
+                var PlayId =2;
+                var isPlay = 0;
+                $scope.play =function(){
+                    var audioPlayer = document.getElementById("music_player");
+                    if(isPlay==0){
+                        audioPlayer.play();
+                        isPlay = 1;
+                    }else{
+                        audioPlayer.pause();
+                        isPlay = 0;
+                    }
+                }
+                $scope.playById = function(id){
+                    $scope.src = "music/"+id+".mp3"
+                    document.getElementById("music_player").load();
+                    document.getElementById("music_player").play();
+                    isPlay = 1;
+                }
+                $scope.prev = function(){
+                    if(PlayId<=0){
+                        PlayId=0;
+                    }else{
+                        PlayId--;
+                    }
+                    $scope.src = "music/"+$scope.items[PlayId].id+".mp3";
+                    document.getElementById("music_player").load();
+                    document.getElementById("music_player").play();
+                    isPlay = 1;
+                }
+                $scope.next = function(){
+                    if(PlayId>=5){
+                        PlayId = 5;
+                    }else{
+                        PlayId++;
+                    }
+                    $scope.src = "music/"+$scope.items[PlayId].id+".mp3";
+                    document.getElementById("music_player").load();
+                    document.getElementById("music_player").play();
+                    isPlay = 1;
+                }
+            })
+
+</script>
+<script id="playlists.html" type="text/ng-template">
+    <ion-view title="音乐列表" ng-controller="playlistsCtrl">
+        <ion-nav-buttons>
+            <button menu-toggle="left" class="button button-icon icon ion-ios-musical-notes">
+
+            </button>
+        </ion-nav-buttons>
+        <ion-content>
+            <audio preload="auto" controls="controls" id="music_player">
+                <source ng-src="{{src}}" id="sourceMp3"/>
+            </audio>
+            <ion-list>
+                <ion-item ng-repeat="i in items" ng-click="playById(i.id)">{{i.name}}</ion-item>
+            </ion-list>
+        </ion-content>
+        <ion-tabs class="tabs-royal">
+            <ion-tab title="上一首" ng-click="prev()"></ion-tab>
+            <ion-tab title="播放" ng-click="play()"></ion-tab>
+            <ion-tab title="下一首" ng-click="next()"></ion-tab>
+            <ion-tab title="随便听听"></ion-tab>
+        </ion-tabs>
+    </ion-view>
+</script>
+<script id="center.html" type="text/ng-template">
+    <ion-view title="个人中心">
+        <ion-nav-buttons>
+            <button menu-toggle="left" class="button button-icon icon ion-ios-personadd">
+            </button>
+        </ion-nav-buttons>
+        <ion-content>
+            <ion-item>4</ion-item>
+            <ion-item>5</ion-item>
+            <ion-item>6</ion-item>
+        </ion-content>
+    </ion-view>
+</script>
+<script id="collection.html" type="text/ng-template">
+    <ion-view title="我的收藏">
+        <ion-nav-buttons>
+            <button menu-toggle="left" class="button button-icon icon ion-ios-albums">
+            </button>
+        </ion-nav-buttons>
+        <ion-content>
+            <ion-item>7</ion-item>
+            <ion-item>8</ion-item>
+            <ion-item>9</ion-item>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script id="menu.html" type="text/ng-template">
+    <!--1 侧边栏容器-->
+    <ion-side-menus>
+        <!--2 侧边栏的内容-->
+        <ion-side-menu-content>
+            <!--3 导航信息-->
+            <ion-nav-bar class="bar-royal"></ion-nav-bar>
+            <!--4 右侧对应的内容 这里的name值和路由中配置views名 对应-->
+            <ion-nav-view  name="menuContent"></ion-nav-view>
+        </ion-side-menu-content>
+        <!--侧边栏自己的内容-->
+        <ion-side-menu side="left">
+            <header class="bar bar-header bar-dark">
+                <h1 class="title">left</h1>
+            </header>
+            <ion-content id="menuCon">
+                <ion-item ui-sref="app.playlists" menu-close>音乐列表</ion-item>
+                <ion-item ui-sref="app.center" menu-close>个人中心</ion-item>
+                <ion-item ui-sref="app.collection" menu-close>我的收藏</ion-item>
+            </ion-content>
+        </ion-side-menu>
+    </ion-side-menus>
+</script>
+</body>
+</html>
